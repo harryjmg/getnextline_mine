@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <fcntl.h>
 
-#define BUFF_SIZE 16
+#define BUFF_SIZE 1
 
 static int			search_line(char *str)
 {
@@ -59,29 +59,33 @@ static char			*push_to_stock(char *stock, char *buf)
 
 int					get_next_line(int const fd, char **line)
 {
-	static char		*stock[256] = {""};
+	static char		*stock = "";
 	int				ret;
 	char			buf[BUFF_SIZE + 1];
 
 	if (fd < 0 || !line)
 		return (-1);
-	if (search_line(stock[fd]))
+	if (search_line(stock))
 	{
-		stock[fd] = extract_line(stock[fd], search_line(stock[fd]), line);
+		stock = extract_line(stock, search_line(stock), line);
 		return (1);
 	}
-	printf("passed\n");
-	while (search_line(stock[fd]) == 0 && ret != 0)
+	printf("1\n");
+	while (search_line(stock) == 0 && (ret = read(fd, buf, BUFF_SIZE)) > 0)
 	{
-		//printf("stock b1 [%s]", stock[fd]);
-		ret = read(fd, buf, BUFF_SIZE);
+		printf("o");
 		buf[ret] = 0;
-		stock[fd] = push_to_stock(stock[fd], buf);
-		//printf("stock b2 [%s]\n", stock[fd]);
+		stock = push_to_stock(stock, buf);
 	}
-	if (ret == 0 && search_line(stock[fd]) == 0)
+	printf("2\n");
+	if (ret == 0 && search_line(stock) == 0)
+	{
+		printf("ret 0\n");
 		return (0);
-	stock[fd] = extract_line(stock[fd], search_line(stock[fd]), line);
+	}
+	printf("3\n");
+	stock = extract_line(stock, search_line(stock), line);
+	printf("4 [%s]\n", stock);
 	return (1);
 }
 
@@ -104,11 +108,11 @@ int					main()
 	// line = 0;
 	// get_next_line(0, &line);
 	// printf("[%s]\n", line);
-	fd = open("testfile", O_RDONLY);
+	fd = open("test", O_RDONLY);
 	line = 0;
 	while ((ret = get_next_line(fd, &line)) > 0)
 	{
-		printf("-> [%s] [%d]\n", line, ret);
+		printf("-> [%s] [%d]\n", line, ret);\
 		line = 0;
 	}
 	return (0);
