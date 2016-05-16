@@ -1,93 +1,83 @@
+#include "get_next_line.h"
 #include <stdio.h>
-#include <string.h>
-#include <sys/types.h>
-#include <sys/uio.h>
-#include <unistd.h>
-#include <stdlib.h>
-#include <fcntl.h>
 
-#define BUFF_SIZE 1
-
-static int			search_line(char *str)
+static int			verif_nl(char *stock)
 {
 	int				i;
+	int				d;
 
 	i = 0;
-	while (str[i] != 0)
+	d = 0;
+	while (stock[i])
 	{
-		if (str[i] == '\n')
-			return (i);
+		if (stock[i] == '\n')
+			return (1);
 		i++;
 	}
 	return (0);
 }
 
-static char			*extract_line(char *stock, int nl_pos, char **line)
+static char			*add_to_stock(char *stock, char *buf, int ret)
 {
+	int				len;
 	char			*new_stock;
-	int				i;
-	int				j;
 
-	j = nl_pos;
-	if (j == 0)
-		j = strlen(stock);
-	*line = (char *)malloc(sizeof(char) * (j + 1));
-	i = 0;
-	while (i < j)
-	{
-		(*line)[i] = stock[i];
-		i++;
-	}
-	(*line)[i] = 0;
-	if (nl_pos == 0)
-		new_stock = strdup(stock + j);
-	else
-		new_stock = strdup(stock + j + 1);
+	len = ft_strlen(stock);
+	new_stock = (char *)malloc(sizeof(char) * (len + ret + 1));
+	new_stock[0] = 0;
+	ft_strcat(new_stock, stock);
+	ft_strcat(new_stock, buf);
 	return (new_stock);
 }
 
-static char			*push_to_stock(char *stock, char *buf)
+static char			*get_line(char **stock)
 {
-	char			*new_stock;
+	int				i;
+	char			*s;
+	char			*line;
 
-	new_stock = (char *)malloc(sizeof(strlen(stock) + strlen(buf) + 2));
-	new_stock[0] = 0;
-	new_stock = strcat(new_stock, stock);
-	new_stock = strcat(new_stock, buf);
-	return (new_stock);
+	s = *stock;
+	i = 0;
+	while (s[i] != '\n' && s[i] != 0)
+		i++;
+	line = (char *)malloc(sizeof(char) * (i + 1));
+	i = 0;
+	while (s[i] != '\n' && s[i] != 0)
+	{
+		line[i] = s[i];
+		i++;
+	}
+	*stock = *stock + i + 1;
+	line[i] = '\0';
+	return (line);
 }
 
 int					get_next_line(int const fd, char **line)
 {
-	static char		*stock = "";
 	int				ret;
 	char			buf[BUFF_SIZE + 1];
+	static char		*stock = "";
 
 	if (fd < 0 || !line)
 		return (-1);
-	if (search_line(stock))
+	ret = read(fd, buf, BUFF_SIZE);
+	if (ret == -1)
+		return (-1);
+	buf[ret] = '\0';
+	stock = add_to_stock(stock, buf, ret);
+	while (verif_nl(stock) == 0 && ret != 0)
 	{
-		stock = extract_line(stock, search_line(stock), line);
-		return (1);
+		ft_bzero(buf, BUFF_SIZE);
+		ret = read(fd, buf, BUFF_SIZE);
+		buf[ret] = '\0';
+		stock = add_to_stock(stock, buf, ret);
 	}
-	printf("1\n");
-	while (search_line(stock) == 0 && (ret = read(fd, buf, BUFF_SIZE)) > 0)
-	{
-		printf("o");
-		buf[ret] = 0;
-		stock = push_to_stock(stock, buf);
-	}
-	printf("2\n");
-	if (ret == 0 && search_line(stock) == 0)
-	{
-		printf("ret 0\n");
+	if (ft_strlen(stock) == 0 && ret <= BUFF_SIZE)
 		return (0);
-	}
-	printf("3\n");
-	stock = extract_line(stock, search_line(stock), line);
-	printf("4 [%s]\n", stock);
+	*line = get_line(&stock);
 	return (1);
 }
+
 
 int					main()
 {
