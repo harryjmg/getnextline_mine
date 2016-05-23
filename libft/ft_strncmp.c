@@ -1,24 +1,29 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line.h                                    :+:      :+:    :+:   */
+/*   ft_strncmp.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: hgueguen <hgueguen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2013/11/20 20:21:48 by hgueguen          #+#    #+#             */
-/*   Updated: 2014/04/20 21:42:48 by hgueguen         ###   ########.fr       */
+/*   Created: 2013/11/22 11:29:45 by hgueguen          #+#    #+#             */
+/*   Updated: 2013/12/01 20:31:26 by hgueguen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef GET_NEXT_LINE_H
-# define GET_NEXT_LINE_H
-# define BUFF_SIZE 8
+#include "libft.h"
 
-# include <unistd.h>
-# include <fcntl.h>
-# include <stdlib.h>
-# include "libft/libft.h"
+int		ft_strncmp(const char *s1, const char *s2, size_t n)
+{
+	size_t i;
 
-int		get_next_line(const int fd, char **line);
-
-#endif
+	i = 0;
+	while (s1[i] == s2[i])
+	{
+		if (i >= n)
+			return (0);
+		if (s1[i] == 0)
+			return (0);
+		i++;
+	}
+	return (s1[i] - s2[i]);
+}

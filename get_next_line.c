@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   get_next_line.c                                    :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: hgueguen <hgueguen@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2013/11/20 20:21:48 by hgueguen          #+#    #+#             */
+/*   Updated: 2014/04/20 21:42:48 by hgueguen         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "get_next_line.h"
 #include <stdio.h>
 
@@ -76,34 +88,4 @@ int					get_next_line(int const fd, char **line)
 		return (0);
 	*line = get_line(&stock);
 	return (1);
-}
-
-
-int					main()
-{
-	char			*line;
-	int				ret;
-	int				fd;
-
-	// line = 0;
-	// av[1] = extract_line(av[1], 0, &line);
-	// printf("[%s]\n", line);
-	// printf("[%s]\n", av[1]);
-	// line = 0;
-	// get_next_line(0, &line);
-	// printf("[%s]\n", line);
-	// line = 0;
-	// get_next_line(0, &line);
-	// printf("[%s]\n", line);
-	// line = 0;
-	// get_next_line(0, &line);
-	// printf("[%s]\n", line);
-	fd = open("test", O_RDONLY);
-	line = 0;
-	while ((ret = get_next_line(fd, &line)) > 0)
-	{
-		printf("-> [%s] [%d]\n", line, ret);\
-		line = 0;
-	}
-	return (0);
 }
